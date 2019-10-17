@@ -1,0 +1,1 @@
+insert into USERS (name, TOKEN) values("hahaha", "123456789");

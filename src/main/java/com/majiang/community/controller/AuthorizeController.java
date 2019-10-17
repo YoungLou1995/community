@@ -11,7 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.plaf.ProgressBarUI;
 import java.util.UUID;
 
@@ -36,7 +38,8 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
-                           HttpServletRequest request){
+                           HttpServletRequest request,
+                           HttpServletResponse response){
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setCode(code);
         accessTokenDTO.setState(state);
@@ -44,17 +47,24 @@ public class AuthorizeController {
         accessTokenDTO.setClient_id(githubClientId);
         accessTokenDTO.setClient_secret(githubClientSecret);
         String acceessToken = githubProvider.getAcceessToken(accessTokenDTO);
+        // Get user infos from github with accessToken
         GithubUser githubUser = githubProvider.getUser(acceessToken);
         if (githubUser != null){
             // 登录成功，写cookie，和session
+
+            // Store user infos to DB
             User user = new User();
-            user.setToken(UUID.randomUUID().toString());
+            String token = UUID.randomUUID().toString();
+            user.setToken(token);
             user.setName(githubUser.getName());
             user.setAccountId(githubUser.getId());
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
-
             userMapper.inset(user);
+
+            // Add Cookie
+            response.addCookie(new Cookie("token", token));
+
             request.getSession().setAttribute("user", githubUser);
             return "redirect:/";
         }else{

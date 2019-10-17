@@ -8,6 +8,18 @@ public class User {
     private Long gmtCreate;
     private Long gmtModified;
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", accountId='" + accountId + '\'' +
+                ", token='" + token + '\'' +
+                ", gmtCreate=" + gmtCreate +
+                ", gmtModified=" + gmtModified +
+                '}';
+    }
+
     public Integer getId() {
         return id;
     }

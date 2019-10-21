@@ -60,6 +60,7 @@ public class AuthorizeController {
             user.setAccountId(githubUser.getId());
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl(githubUser.getAvatarUrl());
             userMapper.inset(user);
 
             // Add Cookie

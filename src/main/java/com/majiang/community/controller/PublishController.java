@@ -23,43 +23,67 @@ public class PublishController {
 //
     @GetMapping("/publish")
     public String publish(){
+        System.out.println("publish()...");
         return "publish";
     }
 
-//    @PostMapping("/publish")
-//    public String doPublish(
-//            @RequestParam("title") String title,
-//            @RequestParam("description") String description,
-//            @RequestParam("tag") String tag,
-//            HttpServletRequest request,
-//            Model model){
-//        User user = null;
-//        Cookie[] cookies = request.getCookies();
-//        for (Cookie cookie : cookies) {
-//            if (cookie.getName().equals("token")){
-//                String token = cookie.getValue();
-//                user = userMapper.findByToken(token);
-//                if (user != null){
-//                    request.getSession().setAttribute("user", user);
-//                }
-//                break;
-//            }
-//        }
-//
-//        if (user == null){
-//            model.addAttribute("error", "haven't login yet!" );
-//            return "publish";
-//        }
-//        Question question = new Question();
-//        question.setTitle(title);
-//        question.setDescription(description);
-//        question.setTag(String.valueOf(tag));
-//        question.setCreator(user.getId());
-//        question.setGmtCreate(user.getGmtCreate());
-//        question.setGmtModified(user.getGmtModified());
-//
-//        questionMapper.create(question);
-//        return "publish";
-//    }
+    @PostMapping("/doPublish")
+    public String doPublish(
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "tag", required = false) String tag,
+            HttpServletRequest request,
+            Model model){
+        System.out.println("doPublish()...");
+        if (title==null || title==""){
+            model.addAttribute("title", title);
+            return "publish";
+        }
+
+        if (description==null || description==""){
+            model.addAttribute("description", description);
+            return "publish";
+        }
+
+        if (tag==null || tag==""){
+            model.addAttribute("tag", tag);
+            return "publish";
+        }
+
+        model.addAttribute("title", title);
+        model.addAttribute("description", description);
+        model.addAttribute("tag", tag);
+
+
+
+        User user = null;
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("token")){
+                String token = cookie.getValue();
+                user = userMapper.findByToken(token);
+                if (user != null){
+                    request.getSession().setAttribute("user", user);
+                }
+                break;
+            }
+        }
+
+        if (user == null){
+            model.addAttribute("error", "haven't login yet!" );
+            return "publish";
+        }
+        Question question = new Question();
+        question.setTitle(title);
+        question.setDescription(description);
+        question.setTag(String.valueOf(tag));
+        question.setCreator(user.getId());
+        question.setGmtCreate(user.getGmtCreate());
+        question.setGmtModified(user.getGmtModified());
+
+        questionMapper.create(question);
+        System.out.println("Yep!");
+        return "publish";
+    }
 
 }
